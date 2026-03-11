@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OncoPrediction — IA pour l'oncologie gastro-œsophagienne</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy-900: #050d1a;
+            --navy-800: #0b1628;
+            --navy-700: #112240;
+            --navy-600: #1e3a5f;
+            --teal:     #0ea5e9;
+            --teal-dk:  #0284c7;
+            --teal-lt:  #38bdf8;
+            --white:    #ffffff;
+            --gray-50:  #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-700: #334155;
+            --gray-900: #0f172a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--gray-900);
+            background: var(--white);
+            line-height: 1.6;
+        }
+
+        /* ══════════════════════════════
+           NAVBAR
+        ══════════════════════════════ */
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1000;
+            background: rgba(255,255,255,0.97);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            height: 68px;
+            padding: 0 52px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(0,0,0,0.07);
+            box-shadow: 0 1px 16px rgba(0,0,0,0.04);
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .nav-logo-icon {
+            width: 34px; height: 34px;
+            background: linear-gradient(135deg, var(--navy-800), var(--navy-600));
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .nav-logo-icon svg { width: 18px; height: 18px; }
+
+        .nav-brand {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--navy-800);
+            letter-spacing: -0.02em;
+        }
+
+        .nav-brand em { color: var(--teal); font-style: normal; }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--gray-500);
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: var(--navy-800); }
+
+        .btn-nav {
+            background: var(--navy-800) !important;
+            color: white !important;
+            padding: 9px 20px !important;
+            border-radius: 8px;
+            font-size: 13px !important;
+            font-weight: 600 !important;
+            transition: all 0.2s !important;
+            white-space: nowrap;
+        }
+
+        .btn-nav:hover {
+            background: var(--teal) !important;
+            transform: translateY(-1px);
+        }
+
+        /* ══════════════════════════════
+           HERO
+        ══════════════════════════════ */
+        .hero {
+            min-height: 100vh;
+            background: var(--navy-800);
+            display: flex;
+            align-items: center;
+            padding: 130px 52px 90px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute; inset: 0;
+            background:
+                radial-gradient(ellipse 900px 700px at 75% 55%, rgba(14,165,233,0.09) 0%, transparent 65%),
+                radial-gradient(ellipse 500px 400px at 15% 80%, rgba(30,58,95,0.45) 0%, transparent 65%);
+            pointer-events: none;
+        }
+
+        /* subtle grid texture */
+        .hero::after {
+            content: '';
+            position: absolute; inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+        }
+
+        .hero-inner {
+            max-width: 1120px;
+            margin: 0 auto;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(14,165,233,0.1);
+            border: 1px solid rgba(14,165,233,0.22);
+            padding: 6px 14px;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--teal-lt);
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            margin-bottom: 28px;
+        }
+
+        .pulse-dot {
+            width: 6px; height: 6px;
+            background: var(--teal);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+            flex-shrink: 0;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50%       { opacity: 0.45; transform: scale(0.75); }
+        }
+
+        .hero h1 {
+            font-size: clamp(34px, 4.2vw, 54px);
+            font-weight: 800;
+            line-height: 1.1;
+            color: var(--white);
+            letter-spacing: -0.03em;
+            margin-bottom: 22px;
+        }
+
+        .hero h1 .accent { color: var(--teal); }
+
+        .hero-sub {
+            font-size: 16px;
+            color: var(--gray-400);
+            line-height: 1.8;
+            margin-bottom: 40px;
+            max-width: 470px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: var(--teal);
+            color: white;
+            padding: 14px 28px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            background: var(--teal-dk);
+            transform: translateY(-2px);
+            box-shadow: 0 14px 36px rgba(14,165,233,0.35);
+        }
+
+        .btn-ghost {
+            color: rgba(255,255,255,0.72);
+            padding: 14px 24px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            border: 1px solid rgba(255,255,255,0.14);
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-ghost:hover {
+            color: white;
+            border-color: rgba(255,255,255,0.32);
+            background: rgba(255,255,255,0.05);
+        }
+
+        /* ── Hero chart visual ── */
+        .hero-visual { position: relative; }
+
+        .chart-wrapper {
+            background: rgba(255,255,255,0.035);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 22px;
+            padding: 28px 28px 22px;
+            backdrop-filter: blur(8px);
+        }
+
+        .chart-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+        }
+
+        .chart-title-txt {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--gray-400);
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .chart-pill {
+            background: rgba(14,165,233,0.14);
+            color: var(--teal-lt);
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 100px;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .chart-legend {
+            display: flex;
+            gap: 18px;
+            margin-top: 16px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 11px;
+            color: var(--gray-400);
+            font-weight: 500;
+        }
+
+        .legend-line {
+            width: 20px;
+            height: 2px;
+            border-radius: 1px;
+            flex-shrink: 0;
+        }
+
+        /* ══════════════════════════════
+           STATS BAR
+        ══════════════════════════════ */
+        .stats-bar {
+            background: var(--navy-700);
+            padding: 44px 52px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .stats-grid {
+            max-width: 1120px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 0 24px;
+            border-right: 1px solid rgba(255,255,255,0.07);
+        }
+
+        .stat-item:first-child { border-left: 1px solid rgba(255,255,255,0.07); }
+
+        .stat-number {
+            font-size: 40px;
+            font-weight: 800;
+            color: var(--white);
+            letter-spacing: -0.04em;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .stat-number em {
+            color: var(--teal);
+            font-style: normal;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--gray-400);
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            line-height: 1.4;
+        }
+
+        /* ══════════════════════════════
+           SHARED SECTION STYLES
+        ══════════════════════════════ */
+        .section { padding: 100px 52px; }
+        .section-light { background: var(--white); }
+        .section-gray  { background: var(--gray-50); }
+
+        .container { max-width: 1120px; margin: 0 auto; }
+
+        .eyebrow {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--teal);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .section-title {
+            font-size: clamp(28px, 3vw, 40px);
+            font-weight: 800;
+            color: var(--navy-800);
+            letter-spacing: -0.025em;
+            line-height: 1.12;
+            margin-bottom: 18px;
+        }
+
+        .section-sub {
+            font-size: 16px;
+            color: var(--gray-500);
+            line-height: 1.75;
+            max-width: 580px;
+        }
+
+        /* ══════════════════════════════
+           CONTEXT — SPLIT LAYOUT
+        ══════════════════════════════ */
+        .split-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 72px;
+            align-items: center;
+            margin-top: 64px;
+        }
+
+        .context-points {
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+
+        .context-point {
+            display: flex;
+            gap: 18px;
+            align-items: flex-start;
+        }
+
+        .point-icon {
+            width: 42px; height: 42px;
+            background: var(--gray-100);
+            border-radius: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 19px;
+            flex-shrink: 0;
+        }
+
+        .point-text h4 {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--navy-800);
+            margin-bottom: 5px;
+        }
+
+        .point-text p {
+            font-size: 14px;
+            color: var(--gray-500);
+            line-height: 1.7;
+        }
+
+        .solution-card {
+            background: var(--navy-800);
+            border-radius: 24px;
+            padding: 40px;
+        }
+
+        .solution-card h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 14px;
+        }
+
+        .solution-card p {
+            font-size: 14px;
+            color: var(--gray-400);
+            line-height: 1.8;
+            margin-bottom: 28px;
+        }
+
+        .solution-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tag {
+            background: rgba(14,165,233,0.14);
+            color: var(--teal-lt);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 13px;
+            border-radius: 7px;
+        }
+
+        /* ══════════════════════════════
+           METHODOLOGY
+        ══════════════════════════════ */
+        .method-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 60px;
+        }
+
+        .method-card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 30px;
+            border: 1px solid var(--gray-200);
+            transition: all 0.22s;
+        }
+
+        .method-card:hover {
+            border-color: var(--teal);
+            box-shadow: 0 8px 32px rgba(14,165,233,0.1);
+            transform: translateY(-4px);
+        }
+
+        .method-num {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--teal);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .method-card h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--navy-800);
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+
+        .method-card p {
+            font-size: 13px;
+            color: var(--gray-500);
+            line-height: 1.72;
+        }
+
+        .method-tag {
+            display: inline-block;
+            background: var(--gray-100);
+            color: var(--gray-700);
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 5px;
+            margin-top: 16px;
+        }
+
+        /* ══════════════════════════════
+           ABOUT
+        ══════════════════════════════ */
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 80px;
+            align-items: start;
+            margin-top: 64px;
+        }
+
+        .profile-card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 36px;
+            border: 1px solid var(--gray-200);
+            display: flex;
+            gap: 26px;
+            align-items: center;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.05);
+        }
+
+        .profile-photo {
+            width: 90px; height: 110px;
+            border-radius: 12px;
+            object-fit: cover;
+            object-position: center top;
+            flex-shrink: 0;
+            display: block;
+        }
+
+        .profile-placeholder {
+            width: 90px; height: 110px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--gray-100), var(--gray-200));
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 34px;
+            flex-shrink: 0;
+        }
+
+        .profile-info h3 {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--navy-800);
+            margin-bottom: 4px;
+            letter-spacing: -0.02em;
+        }
+
+        .profile-role {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--teal);
+            margin-bottom: 10px;
+        }
+
+        .profile-meta {
+            font-size: 13px;
+            color: var(--gray-500);
+            line-height: 1.65;
+        }
+
+        .about-text h3 {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--navy-800);
+            margin-bottom: 16px;
+            letter-spacing: -0.02em;
+        }
+
+        .about-text p {
+            font-size: 15px;
+            color: var(--gray-500);
+            line-height: 1.8;
+            margin-bottom: 18px;
+        }
+
+        .prototype-notice {
+            margin-top: 28px;
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+            border-left: 3px solid var(--teal);
+            border-radius: 0 10px 10px 0;
+            padding: 16px 20px;
+        }
+
+        .prototype-notice p {
+            font-size: 13px;
+            color: var(--gray-500);
+            line-height: 1.65;
+            margin: 0;
+        }
+
+        .prototype-notice strong { color: var(--navy-800); }
+
+        /* ══════════════════════════════
+           CTA
+        ══════════════════════════════ */
+        .cta-section {
+            background: var(--navy-800);
+            padding: 96px 52px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: radial-gradient(ellipse 700px 400px at 50% 50%, rgba(14,165,233,0.07) 0%, transparent 70%);
+        }
+
+        .cta-inner {
+            max-width: 560px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .cta-eyebrow {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--teal);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .cta-section h2 {
+            font-size: clamp(28px, 3.5vw, 38px);
+            font-weight: 800;
+            color: var(--white);
+            letter-spacing: -0.025em;
+            line-height: 1.15;
+            margin-bottom: 16px;
+        }
+
+        .cta-section p {
+            font-size: 15px;
+            color: var(--gray-400);
+            line-height: 1.78;
+            margin-bottom: 36px;
+        }
+
+        .btn-cta {
+            background: var(--teal);
+            color: white;
+            padding: 16px 36px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s;
+        }
+
+        .btn-cta:hover {
+            background: var(--teal-dk);
+            transform: translateY(-2px);
+            box-shadow: 0 16px 44px rgba(14,165,233,0.32);
+        }
+
+        /* ══════════════════════════════
+           FOOTER
+        ══════════════════════════════ */
+        footer {
+            background: var(--navy-900);
+        }
+
+        .footer-logos-bar {
+            background: white;
+            padding: 24px 52px;
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .footer-logos-bar img {
+            height: 48px;
+            width: auto;
+            object-fit: contain;
+            opacity: 0.85;
+            transition: opacity 0.2s;
+        }
+
+        .footer-logos-bar img:hover { opacity: 1; }
+
+        .footer-bottom {
+            padding: 28px 52px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .footer-bottom p {
+            font-size: 12px;
+            color: rgba(255,255,255,0.28);
+            line-height: 1.75;
+        }
+
+        .footer-bottom .disclaimer {
+            font-size: 11px;
+            color: rgba(255,255,255,0.16);
+        }
+
+        /* ══════════════════════════════
+           RESPONSIVE
+        ══════════════════════════════ */
+        @media (max-width: 960px) {
+            nav { padding: 0 24px; }
+            .nav-links li:not(:last-child) { display: none; }
+            .hero { padding: 100px 24px 60px; }
+            .hero-inner { grid-template-columns: 1fr; gap: 52px; }
+            .stats-bar { padding: 36px 24px; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 0; }
+            .stat-item { padding: 20px 16px; }
+            .stat-item:nth-child(2) { border-right: 1px solid rgba(255,255,255,0.07); }
+            .stat-item:nth-child(3) { border-left: 1px solid rgba(255,255,255,0.07); border-right: none; }
+            .stat-item:nth-child(4) { border-right: 1px solid rgba(255,255,255,0.07); }
+            .section { padding: 72px 24px; }
+            .split-grid { grid-template-columns: 1fr; gap: 40px; }
+            .method-grid { grid-template-columns: 1fr; }
+            .about-grid { grid-template-columns: 1fr; gap: 40px; }
+            .profile-card { flex-direction: column; text-align: center; }
+            .footer-logos-bar { padding: 20px 24px; gap: 24px; }
+            .footer-logos-bar img { height: 38px; }
+            .footer-bottom { flex-direction: column; align-items: flex-start; padding: 24px; }
+            .cta-section { padding: 72px 24px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ══ NAVBAR ══ -->
+<nav>
+    <a href="#accueil" class="nav-logo">
+        <div class="nav-logo-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"
+                 stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+            </svg>
+        </div>
+        <span class="nav-brand">Onco<em>Prediction</em></span>
+    </a>
+    <ul class="nav-links">
+        <li><a href="#contexte">Contexte</a></li>
+        <li><a href="#methodologie">Méthodologie</a></li>
+        <li><a href="#apropos">À propos</a></li>
+        <li><a href="#perspectives">Perspectives</a></li>
+        <li><a href="https://app.oncoprediction.ch" class="btn-nav">Accéder à l'application →</a></li>
+    </ul>
+</nav>
+
+<!-- ══ HERO ══ -->
+<section class="hero" id="accueil">
+    <div class="hero-inner">
+
+        <!-- Texte gauche -->
+        <div class="hero-text">
+            <div class="hero-badge">
+                <span class="pulse-dot"></span>
+                Prototype · Démonstration clinique
+            </div>
+            <h1>L'intelligence artificielle<br>pour la prédiction de survie<br>en <span class="accent">oncologie</span></h1>
+            <p class="hero-sub">
+                OncoPrediction intègre des modèles d'apprentissage automatique pour estimer
+                la survie individuelle des patients atteints de cancers gastro-œsophagiens —
+                un outil d'aide à la décision conçu pour les Tumor Boards.
+            </p>
+            <div class="hero-buttons">
+                <a href="https://app.oncoprediction.ch" class="btn-primary">
+                    Accéder à l'application →
+                </a>
+                <a href="#methodologie" class="btn-ghost">
+                    Voir la méthodologie
+                </a>
+            </div>
+        </div>
+
+        <!-- Visuel droite : courbes de survie SVG -->
+        <div class="hero-visual">
+            <div class="chart-wrapper">
+                <div class="chart-header">
+                    <span class="chart-title-txt">Courbes de survie prédites</span>
+                    <span class="chart-pill">Kaplan-Meier</span>
+                </div>
+
+                <svg viewBox="0 0 400 230" fill="none" xmlns="http://www.w3.org/2000/svg"
+                     style="width:100%; height:auto; display:block;">
+
+                    <!-- Grille de fond -->
+                    <line x1="48" y1="20"  x2="48"  y2="194" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+                    <line x1="48" y1="194" x2="392" y2="194" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+                    <line x1="48" y1="148" x2="392" y2="148" stroke="rgba(255,255,255,0.035)" stroke-width="1" stroke-dasharray="4,5"/>
+                    <line x1="48" y1="102" x2="392" y2="102" stroke="rgba(255,255,255,0.035)" stroke-width="1" stroke-dasharray="4,5"/>
+                    <line x1="48" y1="56"  x2="392" y2="56"  stroke="rgba(255,255,255,0.035)" stroke-width="1" stroke-dasharray="4,5"/>
+
+                    <!-- Axe Y labels -->
+                    <text x="40" y="197" fill="rgba(255,255,255,0.28)" font-size="9" text-anchor="end" font-family="monospace">0%</text>
+                    <text x="40" y="151" fill="rgba(255,255,255,0.28)" font-size="9" text-anchor="end" font-family="monospace">25%</text>
+                    <text x="40" y="105" fill="rgba(255,255,255,0.28)" font-size="9" text-anchor="end" font-family="monospace">50%</text>
+                    <text x="40" y="59"  fill="rgba(255,255,255,0.28)" font-size="9" text-anchor="end" font-family="monospace">75%</text>
+
+                    <!-- Axe X labels (mois) -->
+                    <text x="48"  y="208" fill="rgba(255,255,255,0.28)" font-size="9" text-anchor="middle" font-family="monospace">0</text>
+                    <text x="134" y="208" fill="rgba(255,255,255,0.28)" font-size="9" text-anchor="middle" font-family="monospace">12</text>
+                    <text x="220" y="208" fill="rgba(255,255,255,0.28)" font-size="9" text-anchor="middle" font-family="monospace">24</text>
+                    <text x="306" y="208" fill="rgba(255,255,255,0.28)" font-size="9" text-anchor="middle" font-family="monospace">36</text>
+                    <text x="392" y="208" fill="rgba(255,255,255,0.28)" font-size="9" text-anchor="middle" font-family="monospace">48</text>
+                    <text x="220" y="222" fill="rgba(255,255,255,0.18)" font-size="9" text-anchor="middle" font-family="monospace">Mois</text>
+
+                    <!-- Zone remplie stade I-II (teal transparent) -->
+                    <polygon
+                        points="48,30 70,33 95,37 120,44 134,52 155,63 180,77 220,94 260,110 306,127 350,140 392,149  392,194 48,194"
+                        fill="rgba(14,165,233,0.06)"/>
+
+                    <!-- Stade I-II (meilleur pronostic — teal vif) -->
+                    <polyline
+                        points="48,30 70,33 95,37 120,44 134,52 155,63 180,77 220,94 260,110 306,127 350,140 392,149"
+                        stroke="#0ea5e9" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round"/>
+
+                    <!-- Stade III (pronostic intermédiaire — blanc semi-transparent, tirets) -->
+                    <polyline
+                        points="48,30 70,38 95,50 120,65 134,77 155,96 180,115 220,135 260,154 306,168 350,177 392,182"
+                        stroke="rgba(255,255,255,0.48)" stroke-width="1.8"
+                        stroke-linecap="round" stroke-linejoin="round"
+                        stroke-dasharray="7,4"/>
+
+                    <!-- Stade IV (mauvais pronostic — teal atténué) -->
+                    <polyline
+                        points="48,30 70,46 95,66 120,88 134,104 155,124 180,143 220,160 260,172 306,182 350,188 392,192"
+                        stroke="rgba(14,165,233,0.32)" stroke-width="1.5"
+                        stroke-linecap="round" stroke-linejoin="round"/>
+
+                    <!-- Ligne médiane 28,7 mois -->
+                    <line x1="220" y1="22" x2="220" y2="194"
+                          stroke="rgba(255,255,255,0.1)" stroke-width="1" stroke-dasharray="3,4"/>
+                    <text x="224" y="34" fill="rgba(255,255,255,0.2)" font-size="8" font-family="monospace">28,7 m</text>
+                </svg>
+
+                <div class="chart-legend">
+                    <div class="legend-item">
+                        <div class="legend-line" style="background:#0ea5e9;"></div>
+                        Stade I–II
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-line" style="background:rgba(255,255,255,0.48); border-top:2px dashed rgba(255,255,255,0.48); height:0;"></div>
+                        Stade III
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-line" style="background:rgba(14,165,233,0.38);"></div>
+                        Stade IV
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- ══ STATS BAR ══ -->
+<div class="stats-bar">
+    <div class="stats-grid">
+        <div class="stat-item">
+            <div class="stat-number">617</div>
+            <div class="stat-label">Patients<br>Cohorte TCGA</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">0<em>.665</em></div>
+            <div class="stat-label">C-index<br>Modèle Cox</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">6 + 20</div>
+            <div class="stat-label">Variables<br>Cox (sélection) · RSF (encodage complet)</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">2</div>
+            <div class="stat-label">Modèles comparés<br>Cox · RSF</div>
+        </div>
+    </div>
+</div>
+
+<!-- ══ CONTEXTE ══ -->
+<section class="section section-light" id="contexte">
+    <div class="container">
+        <div class="eyebrow">Contexte clinique</div>
+        <h2 class="section-title">Un enjeu pronostique majeur<br>en oncologie digestive</h2>
+        <p class="section-sub">
+            Les cancers gastro-œsophagiens figurent parmi les pathologies digestives les plus létales.
+            Les Tumor Boards font face à des décisions thérapeutiques complexes dans un contexte
+            d'incertitude pronostique souvent sous-outillée.
+        </p>
+
+        <div class="split-grid">
+            <div class="context-points">
+                <div class="context-point">
+                    <div class="point-icon">🎯</div>
+                    <div class="point-text">
+                        <h4>Un besoin clinique non satisfait</h4>
+                        <p>Les outils pronostiques actuels reposent principalement sur le stade TNM,
+                           sans intégrer la richesse des données moléculaires disponibles dans chaque dossier patient.</p>
+                    </div>
+                </div>
+                <div class="context-point">
+                    <div class="point-icon">🧬</div>
+                    <div class="point-text">
+                        <h4>Des données multimodales inexploitées</h4>
+                        <p>Charge mutationnelle (TMB), instabilité microsatellitaire, données histologiques —
+                           ces variables offrent un potentiel pronostique considérable encore sous-utilisé.</p>
+                    </div>
+                </div>
+                <div class="context-point">
+                    <div class="point-icon">🤖</div>
+                    <div class="point-text">
+                        <h4>L'IA comme levier d'aide à la décision</h4>
+                        <p>Les modèles d'apprentissage automatique permettent d'intégrer simultanément
+                           des dizaines de variables et de produire une estimation individualisée du pronostic.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="solution-card">
+                <h3>OncoPrediction en pratique</h3>
+                <p>
+                    À partir de six paramètres cliniques et génomiques immédiatement disponibles,
+                    OncoPrediction génère des courbes de survie individualisées et un score de risque
+                    interprétable pour chaque patient présenté en Tumor Board.
+                </p>
+                <div class="solution-tags">
+                    <span class="tag">Âge</span>
+                    <span class="tag">Grade tumoral</span>
+                    <span class="tag">Stade AJCC</span>
+                    <span class="tag">Radiothérapie</span>
+                    <span class="tag">TMB</span>
+                    <span class="tag">Score MSI</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══ MÉTHODOLOGIE ══ -->
+<section class="section section-gray" id="methodologie">
+    <div class="container">
+        <div class="eyebrow">Approche scientifique</div>
+        <h2 class="section-title">Une méthodologie rigoureuse<br>en 6 étapes</h2>
+        <p class="section-sub">
+            Développé selon les standards de la recherche en biostatistique, OncoPrediction s'appuie
+            sur des données publiques validées et des méthodes éprouvées en analyse de survie.
+        </p>
+
+        <div class="method-grid">
+            <div class="method-card">
+                <div class="method-num">Étape 01</div>
+                <h3>Données & cohorte</h3>
+                <p>617 patients issus de la base TCGA via cBioPortal — cancers gastro-œsophagiens
+                   (440 estomac, 177 œsophage). Données publiques, anonymisées,
+                   de référence internationale.</p>
+                <span class="method-tag">617 patients · TCGA · cBioPortal</span>
+            </div>
+
+            <div class="method-card">
+                <div class="method-num">Étape 02</div>
+                <h3>Prétraitement des données</h3>
+                <p>Standardisation des stades TNM, imputation des valeurs manquantes
+                   (médiane / mode), élimination des variables non informatives.
+                   Résultat : 20 variables, 0 valeur manquante.</p>
+                <span class="method-tag">20 variables · 0 valeur manquante</span>
+            </div>
+
+            <div class="method-card">
+                <div class="method-num">Étape 03</div>
+                <h3>Analyse de Kaplan-Meier</h3>
+                <p>Estimation des courbes de survie globale et par sous-groupes (stade AJCC, grade,
+                   statut métastatique). Survie médiane de 28,7 mois. Tests log-rank significatifs
+                   pour tous les sous-groupes.</p>
+                <span class="method-tag">Survie médiane 28,7 mois</span>
+            </div>
+
+            <div class="method-card">
+                <div class="method-num">Étape 04</div>
+                <h3>Régression de Cox</h3>
+                <p>Modèle raffiné sur 6 variables indépendantes : âge, grade, stade III, stade IV,
+                   radiothérapie et charge mutationnelle (TMB). Retenu comme meilleur modèle
+                   sur ce jeu de données.</p>
+                <span class="method-tag">C-index = 0,665 · Meilleur modèle</span>
+            </div>
+
+            <div class="method-card">
+                <div class="method-num">Étape 05</div>
+                <h3>Forêt de survie aléatoire</h3>
+                <p>Modèle non-paramétrique entraîné sur 44 variables après encodage.
+                   200 arbres, validation croisée 5-fold. Utilisé en complément pour la
+                   visualisation des courbes individuelles.</p>
+                <span class="method-tag">RSF · 200 arbres · CV 5-fold</span>
+            </div>
+
+            <div class="method-card">
+                <div class="method-num">Étape 06</div>
+                <h3>Comparaison & validation</h3>
+                <p>Évaluation sur un jeu de test indépendant de 124 patients via C-index et
+                   Integrated Brier Score. Le modèle de Cox surpasse le RSF sur
+                   cette cohorte.</p>
+                <span class="method-tag">Cox &gt; RSF · IBS = 0,141</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══ IMPACT ══ -->
+<section class="section section-light" id="impact">
+    <div class="container">
+        <div class="eyebrow">Impact clinique</div>
+        <h2 class="section-title">Un besoin concret<br>en Suisse</h2>
+
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:52px;">
+            <div class="method-card" style="text-align:center;padding:36px 24px;">
+                <div style="font-size:38px;font-weight:800;color:var(--teal);letter-spacing:-0.04em;line-height:1;">~1 700</div>
+                <div style="font-size:14px;color:var(--gray-700);margin-top:10px;font-weight:600;">nouveaux cas par an</div>
+                <div style="font-size:12px;color:var(--gray-400);margin-top:4px;line-height:1.4;">cancers gastro-œsophagiens en Suisse</div>
+            </div>
+            <div class="method-card" style="text-align:center;padding:36px 24px;">
+                <div style="font-size:38px;font-weight:800;color:var(--teal);letter-spacing:-0.04em;line-height:1;">100%</div>
+                <div style="font-size:14px;color:var(--gray-700);margin-top:10px;font-weight:600;">discutés en Tumor Board</div>
+                <div style="font-size:12px;color:var(--gray-400);margin-top:4px;line-height:1.4;">prise en charge multidisciplinaire</div>
+            </div>
+            <div class="method-card" style="text-align:center;padding:36px 24px;">
+                <div style="font-size:38px;font-weight:800;color:var(--teal);letter-spacing:-0.04em;line-height:1;">0</div>
+                <div style="font-size:14px;color:var(--gray-700);margin-top:10px;font-weight:600;">outil dédié disponible</div>
+                <div style="font-size:12px;color:var(--gray-400);margin-top:4px;line-height:1.4;">en oncologie digestive en Suisse</div>
+            </div>
+        </div>
+
+        <p style="margin-top:36px;font-size:15px;color:var(--gray-500);line-height:1.8;max-width:800px;">
+            Chaque année en Suisse, environ 1 700 patients sont diagnostiqués avec un cancer gastrique ou
+            œsophagien (Ligue suisse contre le cancer). Chacun de ces patients est discuté en tumor board
+            multidisciplinaire. OncoPrediction vise à enrichir ces discussions en fournissant une estimation
+            individualisée du pronostic, basée sur les données cliniques et génomiques du patient.
+        </p>
+        <p style="margin-top:16px;font-size:15px;color:var(--gray-500);line-height:1.8;max-width:800px;font-style:italic;">
+            À ce jour, aucun outil d'aide à la décision intégrant simultanément données cliniques et
+            moléculaires n'est disponible pour les tumor boards en oncologie digestive en Suisse.
+        </p>
+    </div>
+</section>
+
+<!-- ══ À PROPOS ══ -->
+<section class="section section-light" id="apropos">
+    <div class="container">
+        <div class="eyebrow">Le projet</div>
+        <h2 class="section-title">Une vision née<br>du terrain clinique</h2>
+
+        <div class="about-grid">
+            <!-- Cartes profil -->
+            <div style="display:flex;flex-direction:column;gap:20px;">
+                <div class="profile-card">
+                    <img src="photo.jpg"
+                         alt="Alexandra Dubugnon"
+                         class="profile-photo"
+                         onerror="this.style.display='none'; document.getElementById('ph').style.display='flex'">
+                    <div id="ph" class="profile-placeholder">👩‍⚕️</div>
+                    <div class="profile-info">
+                        <h3>Alexandra Dubugnon</h3>
+                        <div class="profile-role">Étudiante en médecine · 5<sup>e</sup> année</div>
+                        <div class="profile-meta">
+                            Faculté de Médecine<br>
+                            Université de Genève
+                        </div>
+                    </div>
+                </div>
+                <div class="profile-card">
+                    <div style="width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,#1B4F72,#2980B9);display:flex;align-items:center;justify-content:center;color:white;font-size:1.8rem;font-weight:700;flex-shrink:0;letter-spacing:-0.02em;">MC</div>
+                    <div class="profile-info">
+                        <h3>Dr. Mickael Chevalley</h3>
+                        <div class="profile-role">Médecin adjoint · Chirurgie digestive</div>
+                        <div class="profile-meta">
+                            Spécialiste de la prise en charge multidisciplinaire<br>
+                            des cancers œsophagiens et gastriques<br>
+                            Hôpitaux Universitaires de Genève (HUG)
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Texte droite -->
+            <div class="about-text">
+                <h3>De l'observation clinique à l'outil</h3>
+                <p>
+                    OncoPrediction est né d'un constat de terrain : les données disponibles dans chaque
+                    dossier oncologique — stade tumoral, charge mutationnelle, données histologiques —
+                    recèlent un potentiel pronostique considérable, encore rarement intégré de façon
+                    systématique dans la prise de décision clinique.
+                </p>
+                <p>
+                    Ce projet démontre qu'une clinicienne, forte de son expertise médicale et des
+                    ressources numériques actuelles, peut construire un outil d'aide à la décision
+                    fondé sur des méthodes d'apprentissage automatique validées. L'expertise clinique
+                    et la data science ne sont pas des mondes opposés — ils sont complémentaires.
+                </p>
+                <blockquote style="border-left: 3px solid var(--teal); padding-left: 18px; margin: 20px 0; font-style: italic; color: var(--navy-600); font-size: 15px; line-height: 1.7;">
+                    « La plus grande opportunité offerte par l'IA n'est pas de réduire les erreurs
+                    ou la charge de travail : c'est de restaurer le lien précieux entre patients et médecins. »
+                    <p class="quote-attribution" style="font-size: 0.9rem; color: #95A5A6; margin-top: 8px; font-style: normal;">
+                        — Eric Topol, <em>Deep Medicine</em> (Basic Books, 2019)
+                    </p>
+                </blockquote>
+                <p>
+                    OncoPrediction est un premier pas vers cette vision : un outil de soutien aux
+                    Tumor Boards pour une prise en charge plus précise et plus personnalisée de chaque
+                    patient. Ce projet ambitionne de poser les bases d'un développement futur, avec
+                    le soutien de partenaires académiques et institutionnels.
+                </p>
+                <div class="prototype-notice">
+                    <p>
+                        <strong>Statut du projet :</strong> OncoPrediction est un prototype de recherche
+                        développé dans le cadre d'un mémoire de master à l'Université de Genève.
+                        Il est mis à disposition à des fins de démonstration académique et
+                        n'est pas destiné à un usage clinique direct.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══ PERSPECTIVES ══ -->
+<section class="section section-gray" id="perspectives">
+    <div class="container">
+        <div class="eyebrow">Feuille de route</div>
+        <h2 class="section-title">Perspectives de<br>développement</h2>
+
+        <div style="margin-top:52px;position:relative;max-width:720px;">
+            <!-- Ligne verticale -->
+            <div style="position:absolute;left:23px;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,var(--teal),var(--gray-400));"></div>
+
+            <!-- Phase 1 -->
+            <div style="display:flex;gap:28px;margin-bottom:40px;position:relative;">
+                <div style="flex-shrink:0;width:48px;height:48px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:1.1rem;z-index:1;">1</div>
+                <div style="padding-top:8px;">
+                    <div class="eyebrow" style="margin-bottom:6px;">Phase actuelle</div>
+                    <h3 style="font-size:17px;font-weight:700;color:var(--navy-800);">Prototype académique</h3>
+                    <p style="font-size:14px;color:var(--gray-500);margin-top:8px;line-height:1.75;">
+                        Validation sur données TCGA (n=617). Développement de l'application web.
+                        Mémoire de master, Faculté de Médecine, Université de Genève.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Phase 2 -->
+            <div style="display:flex;gap:28px;margin-bottom:40px;position:relative;">
+                <div style="flex-shrink:0;width:48px;height:48px;border-radius:50%;background:var(--navy-700);display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:1.1rem;z-index:1;">2</div>
+                <div style="padding-top:8px;">
+                    <div style="font-size:11px;font-weight:700;color:var(--navy-700);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px;">Prochaine étape</div>
+                    <h3 style="font-size:17px;font-weight:700;color:var(--navy-800);">Validation clinique</h3>
+                    <p style="font-size:14px;color:var(--gray-500);margin-top:8px;line-height:1.75;">
+                        Validation rétrospective sur données hospitalières (HUG), en collaboration avec le
+                        Service de chirurgie digestive. Évaluation de la performance des modèles sur une cohorte locale.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Phase 3 -->
+            <div style="display:flex;gap:28px;position:relative;">
+                <div style="flex-shrink:0;width:48px;height:48px;border-radius:50%;background:var(--gray-400);display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:1.1rem;z-index:1;">3</div>
+                <div style="padding-top:8px;">
+                    <div style="font-size:11px;font-weight:700;color:var(--gray-400);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px;">Objectif</div>
+                    <h3 style="font-size:17px;font-weight:700;color:var(--navy-800);">Déploiement pilote</h3>
+                    <p style="font-size:14px;color:var(--gray-500);margin-top:8px;line-height:1.75;">
+                        Étude prospective en tumor board. Intégration au flux clinique hospitalier.
+                        Développement soutenu par une bourse de recherche pour un déploiement
+                        à l'échelle des hôpitaux suisses.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══ CTA ══ -->
+<section class="cta-section" id="application">
+    <div class="cta-inner">
+        <div class="cta-eyebrow">Prototype disponible</div>
+        <h2>Explorez l'application</h2>
+        <p>
+            Accédez à l'interface de démonstration, saisissez les paramètres cliniques
+            d'un patient et visualisez en temps réel les courbes de survie prédites
+            par les deux modèles.
+        </p>
+        <a href="https://app.oncoprediction.ch" class="btn-cta">
+            Lancer l'application →
+        </a>
+    </div>
+</section>
+
+<!-- ══ PARTENAIRES INSTITUTIONNELS ══ -->
+<section style="padding:60px 52px;background:var(--white);border-top:1px solid var(--gray-200);">
+    <div style="max-width:900px;margin:0 auto;text-align:center;">
+        <div class="eyebrow" style="color:var(--gray-500);">Partenaires institutionnels</div>
+        <p style="margin-top:16px;font-size:15px;color:var(--gray-500);line-height:1.75;max-width:680px;margin-left:auto;margin-right:auto;">
+            Projet développé au sein de la Faculté de Médecine de l'Université de Genève,
+            en collaboration avec le Service de chirurgie digestive des Hôpitaux Universitaires de Genève (HUG).
+        </p>
+        <div style="display:flex;align-items:center;justify-content:center;gap:60px;margin-top:36px;flex-wrap:wrap;">
+            <img src="unige_logo.png" alt="Université de Genève" style="height:60px;width:auto;object-fit:contain;opacity:0.85;transition:opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.85'">
+            <img src="hug_logo.png" alt="Hôpitaux Universitaires de Genève" style="height:60px;width:auto;object-fit:contain;opacity:0.85;transition:opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.85'">
+        </div>
+    </div>
+</section>
+
+<!-- ══ FOOTER ══ -->
+<footer>
+    <div class="footer-bottom">
+        <p>© 2026 Alexandra Dubugnon — Université de Genève</p>
+        <p class="disclaimer">Prototype de recherche · Usage académique · Non destiné à un usage clinique</p>
+    </div>
+</footer>
+
+</body>
+</html>
